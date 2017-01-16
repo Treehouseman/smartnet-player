@@ -105,7 +105,8 @@ html
             i++;
             var li = $("<li/>", {class: "list-group-item" });
             var div = $("<div/>", {id: "graph-"+i, class: "graph"});
-            li.append("<h4/>").text(val.name + ' - ' + val.desc);
+            li.append("<h4/>").text(val.name + ' - ' + val.desc + ' - ');
+            li.append('<a href=http://172.72.85.194:5002/scanner/tg-' + val.num + '>' + val.small + '</href>');
             li.append(div);
             $("#graphs").append(li);
             add_graph("#graph-"+i, val, current);

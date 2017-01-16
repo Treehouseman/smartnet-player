@@ -1,5 +1,8 @@
 //var socket = io.connect('http://robotastic.com');
 var channels;
+var nac2d0;
+var nacf18;
+var nac1f0;
 var source_names = {};
 var per_page;
 var socket;
@@ -8,29 +11,330 @@ var star = false;
 var now_playing = null;
 var autoplay = false;
 
-var groups = [{
-	name: 'Fire',
-	code: 'group-fire'
-}, {
-	name: 'Medical',
-	code: 'group-medical'
-}, {
-	name: 'Services',
-	code: 'group-services'
-}, {
-	name: 'Emergency',
-	code: 'group-emergency'
-}, {
-	name: 'Police',
-	code: 'group-police'
-}, {
-	name: 'Security',
-	code: 'group-security'
-}, {
-	name: 'Transportation',
-	code: 'group-transportation'
-}];
 
+var groups = [{
+	name: 'Cabarrus Law',
+	code: 'tag-cabarrus-law'
+}, {
+	name: 'Cabarrus Sheriff',
+	code: 'group-cabarrus sheriff'
+}, {
+	name: 'Concord Police',
+	code: 'group-concord police'
+}, {
+	name: 'Kannapolis Police',
+	code: 'group-kannapolis police'
+}, {
+	name: 'Cabarrus Fire',
+	code: 'tag-cabarrus-fire'
+}, {
+	name: 'Concord Fire',
+	code: 'tag-concord-fire'
+}, {
+	name: 'Kannapolis Fire',
+	code: 'tag-kannapolis-fire'
+}, {
+	name: 'Cabarrus EMS/FIRE',
+	code: 'tag-cabarrus-ems-fire'
+}, {
+	name: 'Cabarrus Power',
+	code: 'tag-cabarrus-power'
+}, {
+	name: 'Cabarrus Jail',
+	code: 'tag-cabarrus-jail'
+}, {
+	name: 'Cabarrus Bus',
+	code: 'tag-cabarrus-bus'
+}, {
+	name: 'Cabarrus Event',
+	code: 'tag-cabarrus-event'
+}, {
+	name: 'Cabarrus Analog',
+	code: 'tag-cabarrus-analog'
+}];
+var federal_filter = [{
+	name: 'US Forestry',
+	code: 'tag-us-forestry'
+}, {
+	name: 'US Fish and Wildlife',
+	code: 'group-us-fish-and-wildlife'
+}, {
+	name: 'FBI',
+	code: 'group-fbi'
+}, {
+	name: 'Federal Common',
+	code: 'group-federal-common'
+}, {
+	name: 'ATF',
+	code: 'tag-atf'
+}, {
+	name: 'DEA',
+	code: 'tag-dea'
+}, {
+	name: 'Cabarrus Analog',
+	code: 'tag-cabarrus-analog'
+}];
+var state_filter = [{
+	name: 'Air',
+	code: 'tag-air'
+}, {
+	name: 'NC Wildlife',
+	code: 'tag-nc-wildlife'
+}, {
+	name: 'Viper Medical',
+	code: 'tag-viper-medical'
+}, {
+	name: 'Statewide Event',
+	code: 'tag-statewide-event'
+}, {
+	name: 'HP Troop All',
+	code: 'tag-troop-all'
+}, {
+	name: 'HP Troop A',
+	code: 'tag-troop-a'
+}, {
+	name: 'HP Troop B',
+	code: 'tag-troop-b'
+}, {
+	name: 'HP Troop C',
+	code: 'tag-troop-c'
+}, {
+	name: 'HP Troop D',
+	code: 'tag-troop-d'
+}, {
+	name: 'HP Troop E',
+	code: 'tag-troop-e'
+}, {
+	name: 'HP Troop F',
+	code: 'tag-troop-f'
+}, {
+	name: 'HP Troop G',
+	code: 'tag-troop-g'
+}, {
+	name: 'HP Troop H',
+	code: 'tag-troop-h'
+}, {
+	name: 'HP Troop Various',
+	code: 'tag-troop-various'
+}, {
+	name: 'NC Parks',
+	code: 'tag-nc-parks'
+}, {
+	name: 'Department of Corrections',
+	code: 'tag-department-corrections'
+}, {
+	name: 'Department of Defense',
+	code: 'tag-department-defense'
+}, {
+	name: 'Domestic Preparedness and Readiness',
+	code: 'tag-domestic-preparedness'
+}, {
+	name: 'NC DOT',
+	code: 'tag-nc-dot'
+}, {
+	name: 'NC National Guard',
+	code: 'tag-nc-national-guard'
+}, {
+	name: 'SBI',
+	code: 'tag-nc-sbi'
+}, {
+	name: 'License and Theft',
+	code: 'tag-nc-license-theft'
+}, {
+	name: 'HART',
+	code: 'tag-nc-hart'
+}, {
+	name: 'Regional EMS',
+	code: 'tag-regional-ems'
+}, {
+	name: 'Fairgrounds',
+	code: 'tag-fairgrounds'
+}, {
+	name: 'Ports Authority',
+	code: 'tag-ports-authority'
+}, {
+	name: 'Fire Marshal',
+	code: 'tag-nc-fire-marshal'
+}, {
+	name: 'VA',
+	code: 'tag-nc-va'
+}, {
+	name: 'Department of Agriculture',
+	code: 'tag-nc-department-agriculture'
+}, {
+	name: 'ABC',
+	code: 'tag-abc'
+}, {
+	name: 'Alert',
+	code: 'tag-alert'
+}];
+var other_filter = [{
+	name: 'UNCC',
+	code: 'tag-uncc'
+}, {
+	name: 'Duke',
+	code: 'tag-duke'
+}, {
+	name: 'Interop',
+	code: 'tag-interop'
+}, {
+	name: 'Rowan',
+	code: 'tag-rowan'
+}, {
+	name: 'Huntersville',
+	code: 'tag-huntersville'
+}, {
+	name: 'Matthews',
+	code: 'tag-matthews'
+}, {
+	name: 'Davidson',
+	code: 'tag-davidson'
+}, {
+	name: 'Monroe',
+	code: 'tag-monroe'
+}, {
+	name: 'Mint Hill',
+	code: 'tag-mint-hill'
+}, {
+	name: 'Radio',
+	code: 'tag-radio'
+}, {
+	name: '',
+	code: 'tag-'
+}];
+var mecklenburg = [{
+	name: 'CMPD All',
+	code: 'tag-cmpd-all'
+}, {
+	name: 'CMPD Dispatch',
+	code: 'tag-cmpd-dispatch'
+}, {
+	name: 'CMPD Central',
+	code: 'tag-cmpd-central'
+}, {
+	name: 'CMPD Eastway',
+	code: 'tag-cmpd-eastway'
+}, {
+	name: 'CMPD Freedom',
+	code: 'tag-cabarrus-fire'
+}, {
+	name: 'CMPD Hickory Grove',
+	code: 'tag-cmpd-hickory_grove'
+}, {
+	name: 'CMPD Independence',
+	code: 'tag-cmpd-independence'
+}, {
+	name: 'CMPD Metro',
+	code: 'tag-cmpd-metro'
+}, {
+	name: 'CMPD North',
+	code: 'tag-cmpd-north'
+}, {
+	name: 'CMPD North Tryon',
+	code: 'tag-cmpd-north_tryon'
+}, {
+	name: 'CMPD Providence',
+	code: 'tag-cmpd-providence'
+}, {
+	name: 'CMPD South',
+	code: 'tag-cmpd-south'
+}, {
+	name: 'CMPD Steele Creek',
+	code: 'tag-cmpd-steele_creek'
+}, {
+	name: 'CMPD University City',
+	code: 'tag-cmpd-university_city'
+}, {
+	name: 'CMPD Westover',
+	code: 'tag-cmpd-westover'
+}, {
+	name: 'CMPD Tactical',
+	code: 'tag-cmpd-tactical'
+}, {
+	name: 'CMPD Swat',
+	code: 'tag-cmpd-swat'
+}, {
+	name: 'CMPD CEU',
+	code: 'tag-cmpd-ceu'
+}, {
+	name: 'CMPD VCAT',
+	code: 'tag-cmpd-vcat'
+}, {
+	name: 'CMPD Bomb Squad',
+	code: 'tag-cmpd-bomb_squad'
+}, {
+	name: 'Sheriff All',
+	code: 'tag-meck-sheriff-all'
+}, {
+	name: 'Sheriff Dispatch',
+	code: 'tag-meck-sheriff-dispatch'
+}, {
+	name: 'Sheriff Tactical',
+	code: 'tag-meck-sheriff-tactical'
+}, {
+	name: 'Charlotte Fire All',
+	code: 'tag-charlotte-fire-all'
+}, {
+	name: 'Charlotte Fire Dispatch',
+	code: 'tag-charlotte-fire-dispatch'
+}, {
+	name: 'Charlotte Fire Ops',
+	code: 'tag-charlotte-fire-ops'
+}, {
+	name: 'Charlotte EMS All',
+	code: 'tag-charlotte-ems-all'
+}, {
+	name: 'Charlotte EMS Dispatch',
+	code: 'tag-charlotte-ems-dispatch'
+}, {
+	name: 'Charlotte EMS Ops',
+	code: 'tag-charlotte-ems-ops'
+}, {
+	name: 'Mecklenburg Trash',
+	code: 'tag-meck-trash'
+}, {
+	name: 'Mecklenburg Water',
+	code: 'tag-meck-water'
+}, {
+	name: 'Mecklenburg Jail',
+	code: 'tag-mecklenburg-jail'
+}, {
+	name: 'Mecklenburg Fire All',
+	code: 'tag-meck-fire'
+}, {
+	name: 'Mecklenburg EMS All',
+	code: 'tag-meck-ems'
+}, {
+	name: 'Mecklenburg Law All',
+	code: 'tag-meck-law'
+}, {
+	name: 'Mecklenburg Fire Dispatch',
+	code: 'tag-meck-fire-dispatch'
+}, {
+	name: 'Mecklenburg EMS Dispatch',
+	code: 'tag-meck-ems-dispatch'
+}, {
+	name: 'Mecklenburg Law Dispatch',
+	code: 'tag-meck-law-dispatch'
+}, {
+	name: 'CATS All',
+	code: 'tag-cats-all'
+}, {
+	name: 'CATS Bus',
+	code: 'tag-cats-bus'
+}, {
+	name: 'CATS Rail',
+	code: 'tag-cats-rail'
+}, {
+	name: 'Mecklenburg Events Digital',
+	code: 'tag-meck-event-digital'
+}, {
+	name: 'Mecklenburg Events Analog',
+	code: 'tag-meck-event-analog'
+}, {
+	name: 'BOA Stadium All',
+	code: 'tag-mecklenburg-boa-stadium-all'
+}];
 
 if(typeof console === "undefined") {
     console = {
@@ -116,6 +420,7 @@ function star_call(row) {
 
 function play_call(row) {
 	var filename = row.data("filename");
+	//console.log("Trying to play call");
 	var ext = filename.split('.').pop();
 	var setMedia = {};
 	setMedia[ext] = "/media" + filename;
@@ -153,11 +458,13 @@ function source_string(call) {
 	if (call.srcList) {
 		for (var src in call.srcList) {
 			srcNum = call.srcList[src];
+			srcString = srcString + "<a href=http://172.72.85.194:5002/scanner/src-" + srcNum + ">";
 			if (source_names.hasOwnProperty(srcNum)) {
-				srcString = srcString + source_names[srcNum].shortName + " ";
+				srcString = srcString + source_names[srcNum].shortName;
 			} else {
-				srcString = srcString + srcNum + " ";
+				srcString = srcString + srcNum;
 			}
+			srcString = srcString + "</href> "
 		}
 	}
 
@@ -185,25 +492,26 @@ function print_call_row(call, direction, live) {
 
 	buttoncell.append(playbutton);
 	newrow.append(buttoncell);
-	
+	var hexnac = call.nac.toString(16);
 	if (typeof channels[call.talkgroup] == 'undefined') {
 		newrow.append("<td>" + call.len + "</td>");
+		newrow.append("<td>" + hexnac + "</td>");
 		newrow.append("<td>" + call.talkgroup + "</td>");
 		newrow.append("<td>" + time.toLocaleTimeString() + " - " + time.toLocaleDateString()  + "</td>");
 		newrow.append("<td>" + source_string(call) + "</td>");
-		newrow.append("<td>" + call.talkgroup + "</td>");
-		newrow.append("<td>Uknown</td>");
-		newrow.append("<td>Uknown</td>");
+		newrow.append("<td>" + "<a href=http://172.72.85.194:5002/scanner/tg-" + call.talkgroup + ">" + call.talkgroup + "</href>" + "</td>");
+		newrow.append("<td>Unknown</td>");
+		newrow.append("<td>Unknown</td>");
 	} else {
 		newrow.append("<td>" + call.len + "</td>");
+		newrow.append("<td>" + hexnac + "</td>");
 		newrow.append("<td>" + channels[call.talkgroup].alpha + "</td>");
 		newrow.append("<td>" + time.toLocaleTimeString() + " - " + time.toLocaleDateString()  +"</td>");
 		newrow.append("<td>" + source_string(call) + "</td>");
-		newrow.append("<td>" + call.talkgroup + "</td>");
+		newrow.append("<td>" + "<a href=http://172.72.85.194:5002/scanner/tg-" + channels[call.talkgroup].num + ">" + channels[call.talkgroup].small + "</href>" + "</td>");
 		newrow.append("<td>" + channels[call.talkgroup].desc + "</td>");
 		newrow.append("<td>" + channels[call.talkgroup].group + "</td>");
 	}
-	
 	
 	var actioncell = $("<td/>");
 	/*
@@ -213,7 +521,7 @@ function print_call_row(call, direction, live) {
 
 	var callview = $('<a href="/call/' + call.objectId + '"><i class="icon-file call-link"> </i></a><a href="/call/' + call.objectId + '"><span class="glyphicon glyphicon-link call-link"></span></a>');
 	var linkview = $('<i class="icon-share-alt"> </i><span class="glyphicon glyphicon-bullhorn"></span>');
-	var downloadview = $('<a href="http://openmhz.com/media' + call.filename +'"><span class="glyphicon glyphicon-download-alt download-link"></span></a>');
+	var downloadview = $('<a href="http://172.72.85.194:5002/media' + call.filename +'"><span class="glyphicon glyphicon-download-alt download-link"></span></a>');
 	if (call.stars == 0 ) {
 		var starbutton = $('<span class="glyphicon glyphicon-star-empty star-button"></span>');
 		var	starcount = $('<span class="star-count"></span>');
@@ -314,16 +622,31 @@ function add_filters() {
 
 	for (var i = 0; i < groups.length; i++) {
 		var group = groups[i];
-		$("#group-filter").append($('<li><a href="#">' + group.name + '</a></li>').data('code', group.code).data('name', group.name).click(filter_calls));
+		$("#groups-filter").append($('<li><a href="#">' + group.name + '</a></li>').data('code', group.code).data('name', group.name).click(filter_calls));
 	}
-
+	for (var i = 0; i < mecklenburg.length; i++) {
+		var meck = mecklenburg[i];
+		$("#mecklenburg-filter").append($('<li><a href="#">' + meck.name + '</a></li>').data('code', meck.code).data('name', meck.name).click(filter_calls));
+	}
+	for (var i = 0; i < state_filter.length; i++) {
+		var state = state_filter[i];
+		$("#state-filter").append($('<li><a href="#">' + state.name + '</a></li>').data('code', state.code).data('name', state.name).click(filter_calls));
+	}
+	for (var i = 0; i < federal_filter.length; i++) {
+		var federal = federal_filter[i];
+		$("#federal-filter").append($('<li><a href="#">' + federal.name + '</a></li>').data('code', federal.code).data('name', federal.name).click(filter_calls));
+	}
+	for (var i = 0; i < other_filter.length; i++) {
+		var other = other_filter[i];
+		$("#other-filter").append($('<li><a href="#">' + other.name + '</a></li>').data('code', other.code).data('name', other.name).click(filter_calls));
+	}
 }
 
 function add_tg_filter() {
 	for (var chan_num in channels) {
 		if (channels.hasOwnProperty(chan_num)) {
 			var tg = channels[chan_num];
-			$("#tg-filter").append($('<li><a href="#">' + tg.desc + '</a></li>').data('code', 'tg-' + chan_num).data('name', tg.desc).click(filter_calls));
+			$("#tg-filter").append($('<li><a href="#">' + chan_num + ' - ' + tg.desc + '</a></li>').data('code', 'tg-' + chan_num).data('name', tg.desc).click(filter_calls));
 
 		}
 	}
@@ -454,7 +777,7 @@ function socket_connect() {
 	if (!socket) {
 
 		console.log('func socket_connect');
-		socket = new WebSocket('ws://openmhz.com/');
+		socket = new WebSocket('ws://172.72.85.194:5002');
     socket.onmessage = function(e) {
         console.log(e.data); //prints [Object object] string and not the object
         var message = JSON.parse(e.data);

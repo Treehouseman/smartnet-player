@@ -1,8 +1,8 @@
 {
 	"dbUser": "scanner",
 	"dbPass": "vcW6rEixic3kdBWj",
-    "uploadDirectory": "/home/app/smartnet-player/upload",
-    "mediaDirectory": "/home/app/smartnet-player/media",
+    "uploadDirectory": "/home/tripp/share/webupload",
+    "mediaDirectory": "/home/tripp/share/webmedia",
     "twitterConsumerKey": "changeme",
     "twitterConsumerSecret": "changeme"
 }

@@ -63,9 +63,29 @@ html
               ul.nav.navbar-nav
                 li.dropdown
                   a.dropdown-toggle(href='#', data-toggle='dropdown')
-                      | Groups
+                      | Cabarrus
                       b.caret
-                    ul.dropdown-menu(id="group-filter")
+                    ul.dropdown-menu(id="groups-filter")
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                      | Mecklenburg
+                      b.caret
+                    u1.dropdown-menu(id="mecklenburg-filter")
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                      | State
+                      b.caret
+                    u1.dropdown-menu(id="state-filter")
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                      | Federal
+                      b.caret
+                    u1.dropdown-menu(id="federal-filter")
+                li.dropdown
+                  a.dropdown-toggle(href='#', data-toggle='dropdown')
+                      | Other
+                      b.caret
+                    u1.dropdown-menu(id="other-filter")
                 li.dropdown(data-container="body")
                   a.dropdown-toggle(href='#', data-toggle='dropdown', data-container="body" )
                       | Talkgroups
@@ -131,6 +151,7 @@ html
             tr
               th 
               th
+              th NAC
               th Alpha
               th 
               th Chan

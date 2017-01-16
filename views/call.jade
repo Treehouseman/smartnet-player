@@ -72,16 +72,21 @@ html
               .col-md-4
                 h3 #{channel.alpha}
                 small Talkgroup
+          if channel
             .row
               .col-md-2
-                h3 #{freq}
-                small Frequency
+                h3 
+                  a(href='http://172.72.85.194:5002/scanner/tg-'+ channel.num) #{channel.small}
+                small Group
+              .col-md-2
+                h3 #{channel.nac}
+                small NAC
           if srcList
             .row
               -for(var src in srcList)
                 .col-md-2
                   h4 
-                    a(href='http://openmhz.com/scanner/src-'+ srcList[src]) #{srcList[src]}
+                    a(href='http://172.72.85.194:5002/scanner/src-'+ srcList[src]) #{srcList[src]}
                   small Source
 
 

@@ -30,3 +30,5 @@ db.source_names.insert( {_id: 5433, shortName: "Amb19", name: "Ambulance 19"});
 db.source_names.insert( {_id: 5502, shortName: "Amb6", name: "Ambulance 6"});
 db.source_names.insert( {_id: 5516, shortName: "Amb13", name: "Ambulance 13"});
 db.source_names.insert( {_id: 5495, shortName: "Amb30", name: "Ambulance Medic 30"});
+
+db.source_names.insert( {_id: 7000, shortName: "ELO2", name: "EMS Liaison Officer2"});

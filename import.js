@@ -1,3 +1,14 @@
+(function() {
+    var childProcess = require("child_process");
+    var oldSpawn = childProcess.spawn;
+    function mySpawn() {
+        console.log('spawn called');
+        console.log(arguments);
+        var result = oldSpawn.apply(this, arguments);
+        return result;
+    }
+    childProcess.spawn = mySpawn;
+})();
 var mkdirp = require('mkdirp');
 var probe = require('node-ffprobe');
 var wav = require('wav');
@@ -17,6 +28,8 @@ var scanner = new Db('scanner', new Server(host, port, {}));
 var db;
 var channels = {};
 
+
+
 function compile(str, path) {
     return stylus(str)
         .set('filename', path)
@@ -34,6 +47,7 @@ function add_file(files, i) {
               var name = path.basename(f, '.wav');*/
             var regex = /([0-9]*)-([0-9]*)_([0-9.]*)/
             var result = name.match(regex);
+			console.log("Got regex");
             //console.log(name);
             //console.log(util.inspect(result));
             if (result != null) {
@@ -41,14 +55,16 @@ function add_file(files, i) {
                 var time = new Date(parseInt(result[2]) * 1000);
                 var freq = parseFloat(result[3]);
                 //var base_path = '/srv/www/openmhz.com/media';
-                var base_path = '/srv/www/openmhz.com/public/media';
+                var base_path = '/home/tripp/share/webmedia';
                 var local_path = "/" + time.getFullYear() + "/" + time.getMonth() + "/" + time.getDate() + "/";
                 mkdirp.sync(base_path + local_path, function (err) {
                     if (err) console.error(err);
                 });
                 var target_file = base_path + local_path + path.basename(f);
+				console.log("Getting json");
                 var json_file = path.dirname(f) + "/" + name + ".json";
                 fs.readFile(json_file, 'utf8', function (err, data) {
+					console.log("Got past fs.readfile");
                     if (err) {
                         console.log('JSON Error: ' + err);
                         console.log("Base: " + base_path + " Local: " + local_path + " Basename: " + path.basename(f));
@@ -56,26 +72,37 @@ function add_file(files, i) {
                         var srcList = [];
                     } else {
                         try {
+							console.log("Going to parse data");
                             data = JSON.parse(data);
+							console.log("Data parsed");
                         } catch (e) {
+							console.log("Catch e triggered");
                             console.log(e);
+							console.log("Done showing e");
                         }
+						console.log("Getting source list");
                         var srcList = data.srcList;
+						console.log("Got source list");
+						console.log("Going to delete json");
                         fs.unlink(json_file, function (err) {
-                            if (err)
+                            if (err){
                                 console.log('JSON Delete Error: ' + err + " JSON: " + json_file);
+							console.log("Didn't delete");}
                         });
+						console.log("Deleted json");
                     }
 
-
+console.log("Renaming");
                     fs.rename(f, target_file, function (err) {
                         if (err) {
+							console.log("Rename failure");
                             console.log("Rename Error: " + err);
                             console.log("Base: " + base_path + " Local: " + local_path + " Basename: " + path.basename(f));
                             console.log("F Path: " + path.dirname(f));
                             //throw err;
 
                         } else {
+							console.log("Rename success");
                             setTimeout(function () {
                                 probe(target_file, function (err, probeData) {
 
@@ -136,7 +163,7 @@ function add_file(files, i) {
 
 
 
-var source_path = '/home/luke/smartnet-upload';
+var source_path = '/home/tripp/share/webupload';
 
 scanner.open(function (err, scannerDb) {
     db = scannerDb;
