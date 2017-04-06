@@ -81,6 +81,12 @@ html
               .col-md-2
                 h3 #{channel.nac}
                 small NAC
+              .col-md-2
+                h3 #{item.freq}
+                small Frequency
+              .col-md-2
+                h3
+                  a(href='http://172.72.85.194:5002/media/' + item.path + item.name) Download 
           if srcList
             .row
               -for(var src in srcList)

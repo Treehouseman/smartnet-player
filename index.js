@@ -799,6 +799,34 @@ app.get('/star/:id', function (req, res) {
     });
 });
 
+app.get('/unstar/:id', function (req, res) {
+    var objectId = req.params.id;
+    var o_id = new BSON.ObjectID(objectId);
+    db.collection('transmissions', function (err, transCollection) {
+        transCollection.findAndModify({
+                '_id': o_id
+            }, [], {
+                $inc: {
+                    stars: -1
+                }
+            }, {
+                new: true
+            },
+            function (err, object) {
+
+                if (err) {
+                    console.warn(err.message); // returns error if no matching object found
+                } else {
+                    res.contentType('json');
+                    res.setHeader('Access-Control-Allow-Origin', '*');
+                    res.send(JSON.stringify({
+                        stars: object.stars
+                    }));
+                }
+
+            });
+    });
+});
 
 
 app.get('/call/:id', function (req, res) {
@@ -1263,8 +1291,49 @@ app.get('/scanner/newer/:time', function (req, res) {
     });
 });
 
+app.get('/scanner/older/:time', function (req, res) {
+
+    var filter_date = parseInt(req.params.time);
+    var user = req.user;
+
+
+
+
+    if (!filter_date) {
+        var filter_date = "''";
+    } else {
+        var filter_date = "new Date(" + filter_date + ")";
+    }
+
+    res.render('player', {
+        filter_date: filter_date,
+        filter_code: "",
+        user: user
+    });
+});
 
 app.get('/scanner/newer/:time/:filter_code', function (req, res) {
+    var filter_code = req.params.filter_code;
+    var filter_date = parseInt(req.params.time);
+    var user = req.user;
+
+
+    if (!filter_code) filter_code = "";
+
+    if (!filter_date) {
+        var filter_date = "''";
+    } else {
+        var filter_date = "new Date(" + filter_date + ")";
+    }
+
+    res.render('player', {
+        filter_date: filter_date,
+        filter_code: filter_code,
+        user: user
+    });
+});
+
+app.get('/scanner/older/:time/:filter_code', function (req, res) {
     var filter_code = req.params.filter_code;
     var filter_date = parseInt(req.params.time);
     var user = req.user;
@@ -1600,7 +1669,8 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
         }
 });
 
-/*watch.createMonitor(config.uploadDirectory, function (monitor) {
+/*
+watch.createMonitor(config.uploadDirectory, function (monitor) {
     monitor.files['*.m4a'];
     //monitor.files['*.wav'];
 
@@ -1611,10 +1681,10 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
             var name = path.basename(f, '.json');
             var regex = /([0-9]*)-unit_check/
             var result = name.match(regex);
-			//console.log(f.nac);
-			//console.log(path.basename(f));
-			//var jtest = require(f);
-			//console.log(jtest.nac);
+			console.log(f.nac);
+			console.log(path.basename(f));
+			var jtest = require(f);
+			console.log(jtest.nac);
             if (result != null) {
                 console.log("Unit Check: " + f);
                 fs.readFile(f, 'utf8', function (err, data) {
@@ -1654,11 +1724,13 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
             var name = path.basename(f, '.m4a');
             //if ((path.extname(f) == '.wav') && (monitor.files[f] === undefined)) {
               //var name = path.basename(f, '.wav');
-            var regex = /([0-9]*)-([0-9]*)_([0-9.]*)/
+			var regex = /([0-9]*)-([0-9]*)/
             var result = name.match(regex);
+			console.log("Looking for regex");
             //console.log(name);
             //console.log(util.inspect(result));
             if (result != null) {
+				console.log("Got regex");
                 var tg = parseInt(result[1]);
                 var time = new Date(parseInt(result[2]) * 1000);
                 var freq = parseFloat(result[3]);
@@ -1671,6 +1743,7 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
                 var target_file = base_path + local_path + path.basename(f);
                 var json_file = path.dirname(f) + "/" + name + ".json";
 				var nac = 0;
+				console.log("Reading json");
                 fs.readFile(json_file, 'utf8', function (err, data) {
                     if (err) {
                         console.log('JSON Error: ' + err);
@@ -1748,7 +1821,7 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
                                 
                             });
                         }, 10000);
-
+console.log("moving file");
                         fs.unlink(f, function (err) {
                             if (err) {
                                 console.log("Rename Error: " + err);
@@ -1767,6 +1840,7 @@ app.post('/upload', upload.single('call'), function(req, res, next) {
     });
 });
 */
+
 wsServer = new WebSocketServer({
     httpServer: server,
     // You should not use autoAcceptConnections for production

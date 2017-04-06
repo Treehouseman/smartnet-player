@@ -8,6 +8,7 @@ var per_page;
 var socket;
 var live = false;
 var star = false;
+var direction = false;
 var now_playing = null;
 var autoplay = false;
 
@@ -417,6 +418,38 @@ function star_call(row) {
 	});
 }
 
+function unstar_call(row) {
+	var objectId = row.data("objectId");
+	var url = "/unstar/" + objectId;
+
+	$.ajax({
+		url: url,
+		type: "GET",
+		dataType: "json",
+		contentType: "application/json",
+		cache: false,
+		timeout: 5000,
+		complete: function() {
+			//called when complete
+			//console.log('process complete');
+		},
+
+		success: function(data) {
+			$(".star-count", row).text(data.stars);
+			$(".star-button", row).unbind( "click" );
+			if (data.stars==1) {
+				$(".star-button", row).removeClass('glyphicon-star-empty').addClass('glyphicon-star');
+				$(".star-button", row).unbind( "mouseenter" );
+				$(".star-button", row).unbind( "mouseleave" );
+			}
+		},
+
+		error: function() {
+			//console.log('process error');
+		},
+	});
+}
+
 
 function play_call(row) {
 	var filename = row.data("filename");
@@ -504,6 +537,7 @@ function print_call_row(call, direction, live) {
 		newrow.append("<td>Unknown</td>");
 	} else {
 		newrow.append("<td>" + call.len + "</td>");
+//                newrow.append("<td>" + call.freq + "</td>");
 		newrow.append("<td>" + hexnac + "</td>");
 		newrow.append("<td>" + channels[call.talkgroup].alpha + "</td>");
 		newrow.append("<td>" + time.toLocaleTimeString() + " - " + time.toLocaleDateString()  +"</td>");
@@ -535,6 +569,8 @@ function print_call_row(call, direction, live) {
 		var starbutton = $('<span class="glyphicon glyphicon-star star-button"></span>');
 		var	starcount = $('<span class="star-count">' + call.stars + '</span>');
 	}
+	var unstarbutton = $('<span class="glyphicon glyphicon-star-empty unstar-button"></span>');
+	
 	downloadview.mousedown(function() {
 		row = $(this).closest("tr");
 		star_call(row);
@@ -542,6 +578,10 @@ function print_call_row(call, direction, live) {
 	starbutton.click(function() {
 		row = $(this).closest("tr");
 		star_call(row);
+	});
+	unstarbutton.click(function() {
+		row = $(this).closest("tr");
+		unstar_call(row);
 	});
 
 	var btngroup = $('<td/>');
@@ -582,6 +622,8 @@ function print_call_row(call, direction, live) {
 	btngroup.append(downloadview);
 
 	btngroup.append(starbutton);
+	if(call.stars!=0)
+		btngroup.append(unstarbutton);
 	btngroup.append(starcount);
 	newrow.append(btngroup);
 	
@@ -669,7 +711,12 @@ function fetch_calls(url) {
 			url = "/calls";
 		}
 		if (filter_date != "") {
+			if(direction){
+				var url = url + "/older/" + filter_date.getTime();
+			}
+			else{
 			var url = url + "/newer/" + filter_date.getTime();
+			}
 		}
 		if (filter_code != "") {
 			var url = url + "/" + filter_code;
@@ -691,12 +738,14 @@ function fetch_calls(url) {
 		success: function(data) {
 			var browser_url = url.substring(6);
 			browser_url = '/scanner' + browser_url;
+			//console.log(browser_url);
 			if (window.history && history.pushState) {
 				window.history.pushState(data, "page 2", browser_url);
 			}
 			$("#call_table").empty();
 			if (typeof data.calls !== "undefined") {
 				for (var i = 0; i < data.calls.length; i++) {
+					//console.log(data.calls.length);
 					//console.log(data.calls[i]);
 					print_call_row(data.calls[i], data.direction, false);
 				}
@@ -830,6 +879,9 @@ $(document).ready(function() {
 			source_names = data.source_names;
 			add_filters();
 			add_tg_filter();
+							if(window.location.href.indexOf("/older/")){
+					direction = true;
+				}
 			init_table();
 			if (filter_code) {
 				$('#filter-title').html(find_code_name(filter_code));
